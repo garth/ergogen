@@ -118,3 +118,6 @@ dist
 # Project specific
 output
 temp*
+
+.DS_Store
+beamer-backups

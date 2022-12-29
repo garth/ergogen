@@ -21,17 +21,15 @@ module.exports = {
     class: 'S',
     hotswap: false,
     reverse: false,
-    keycaps: false
+    keycaps: false,
+    model: './3d/SW_Kailh_Choc_V1.stp',
+    hotswap_model: './3d/PG1350-socket.STEP',
+    keycap_model: './3d/MBK_Keycap_-_1u.step',
   },
   body: p => {
     const standard = `
       (module PG1350 (layer F.Cu) (tedit 5DD50112)
       ${p.at /* parametric position */}
-
-      ${'' /* footprint reference */}
-      (fp_text reference "${p.ref}" (at 0 0) (layer F.SilkS) ${p.ref_hide} (effects (font (size 1.27 1.27) (thickness 0.15))))
-      (fp_text value "" (at 0 0) (layer F.SilkS) hide (effects (font (size 1.27 1.27) (thickness 0.15))))
-
       ${''/* corner marks */}
       (fp_line (start -7 -6) (end -7 -7) (layer Dwgs.User) (width 0.15))
       (fp_line (start -7 7) (end -6 7) (layer Dwgs.User) (width 0.15))
@@ -75,19 +73,37 @@ module.exports = {
           `
       }
     }
-    if(p.param.reverse) {
+
       return `
         ${standard}
         ${p.param.keycaps ? keycap : ''}
         ${pins('-', '', 'B')}
-        ${pins('', '-', 'F')})
-        `
-    } else {
-      return `
-        ${standard}
-        ${p.param.keycaps ? keycap : ''}
-        ${pins('-', '', 'B')})
+        ${ p.param.reverse ? pins('', '-', 'F') : '' }
+        ${ p.param.hotswap ? `
+          (model ${p.param.hotswap_model}
+              (at (xyz -0.21 0.15 -0.07))
+              (scale (xyz 1 1 1))
+              (rotate (xyz -90 0 180))
+          )
+          ` : ''
+        }
+        
+        ${ p.param.keycaps ? `
+          (model ${p.param.keycap_model}
+              (at (xyz 0 0 0.25))
+              (scale (xyz 1 1 1))
+              (rotate (xyz 0 0 0))
+          )
+          ` : ''
+        }
+        (model ${p.param.model}
+              (at (xyz 0 0 0))
+              (scale (xyz 1 1 1))
+              (rotate (xyz 0 0 0))
+        )
+        
+        
+        )
         `
     }
-  }
 }

@@ -1,0 +1,260 @@
+units:
+  hotpad: 1.25
+  space: 2.54
+  chip_space: 2.055
+  chip_width: 18
+  chip_height: 33
+  display_width: 14
+  display_height: 36
+  chip_x: 0.5cx + 0.5chip_width + chip_space
+  chip_y: -15
+  chip_bottom: chip_y - 0.5chip_height
+  display_top: chip_bottom + chip_height - display_height
+  display_pad_top: chip_bottom - 3.6
+points:
+  zones:
+    matrix:
+      columns:
+        pinky:
+          spread: cx
+          key:
+            column_net: P15
+          rows:
+            bottom:
+              bind: [5, 85, 0, hotpad]
+            home:
+              bind: [5, 0, 0, hotpad]
+            top:
+              bind: [0, 5, 0, hotpad]
+        ring:
+          spread: cx
+          stagger: 0.75cy
+          key:
+            column_net: P18
+          rows:
+            bottom:
+              bind: [0, 0, 0, 5]
+            home:
+              bind: [0, 0, 5, 0]
+            top:
+              bind: [0, 5, 0, hotpad]
+        middle:
+          spread: cx
+          stagger: 0.25cy
+          key:
+            column_net: P19
+          rows:
+            bottom:
+              bind: [0, 5, 5, 5]
+            home:
+              bind: 5
+            top:
+              bind: [0, hotpad, 0, hotpad]
+        index:
+          spread: cx
+          stagger: -0.25cy
+          key:
+            column_net: P20
+          rows:
+            bottom:
+              bind: [0, 5, 0, 0]
+            home:
+              bind: 5
+            top:
+              bind: [0, hotpad, 0, 6]
+        inner:
+          spread: cx
+          stagger: -0.15cy
+          key:
+            column_net: P21
+          rows:
+            bottom:
+              bind: [29.5, 22, 0, 0]
+            home:
+              bind: [5, 0, 5, 0]
+            top:
+              bind: [0, hotpad, 0, 5]
+      key:
+        padding: cy
+        footprints:
+          - type: choc
+            nets:
+              from: =colrow
+              to: =column_net
+            params:
+              keycaps: true
+              reverse: true
+              hotswap: true
+          - type: diode
+            anchor:
+              shift: [0, -4.5]
+              rotate: 180
+            nets:
+              from: =colrow
+              to: =row_net
+            params:
+              via_in_pad: true
+              through_hole: false
+          - type: via
+            anchor:
+              shift: [0, 3]
+            nets:
+              net: =column_net
+      rows:
+        bottom:
+          row_net: P8
+        home:
+          row_net: P7
+        top:
+          row_net: P6
+    thumbfan:
+      anchor:
+        ref: matrix_inner_bottom
+        shift: [-1.1cx, -1.15cy]
+      columns:
+        near:
+          rotate: 10
+          origin: [0.5cx, -0.5cy]
+          key:
+            thumb_net: P16
+            bind: [0, 5, 0, hotpad]
+        home:
+          spread: 1.1cx
+          rotate: -10
+          origin: [-0.5cx, -0.5cy]
+          key:
+            thumb_net: P10
+            bind: [0, 5, 0, 5]
+        far:
+          stagger: 0.25cx
+          spread: 1.1cy
+          rotate: -20
+          origin: [-0.5cy, -0.75cx]
+          key:
+            thumb_net: P9
+            rotate: 90
+            bind: [5, 0.25cx, 0, 0.25cx]
+      rows:
+        thumb:
+      key:
+        footprints:
+          - type: choc
+            nets:
+              from: =thumb_net
+              to: GND
+            params:
+              keycaps: true
+              reverse: true
+              hotswap: true
+          - type: via
+            anchor:
+              shift: [0, 3]
+            nets:
+              net: =thumb_net
+          - type: via
+            anchor:
+              shift: [0, -3]
+            nets:
+              net: GND
+outlines:
+  exports:
+    raw:
+      - type: keys
+        side: both
+        size: [cx, cy]
+    panel:
+      - type: outline
+        name: raw
+        fillet: 1.2
+pcbs:
+  beamer:
+    outlines:
+      main:
+        outline: panel
+    footprints:
+      promicro:
+        type: promicro_pretty
+        anchor:
+          ref: matrix_inner_top
+          shift: [chip_x, chip_y]
+          rotate: -90
+      screen:
+        type: oled
+        anchor:
+          ref: matrix_inner_top
+          shift: [chip_x, display_top]
+          rotate: 90
+        nets:
+          SDA: SCRN_1
+          SCL: SCRN_2
+          VCC: VCC
+          GND: SCRN_4
+          CS: SCRN_5
+      jumper1:
+        type: jumper_reverse
+        anchor:
+          ref: matrix_inner_top
+          shift: [chip_x - 2space - 0.5, display_pad_top + 0.65]
+        nets:
+          b_from: SCRN_1
+          b_to: P2
+          f_from: SCRN_1
+          f_to: P1
+      jumper2:
+        type: jumper_reverse
+        anchor:
+          ref: matrix_inner_top
+          shift: [chip_x - 1space - 0.5, display_pad_top + 0.65]
+        nets:
+          b_from: SCRN_2
+          b_to: P3
+          f_from: SCRN_2
+          f_to: GND
+      jumper4:
+        type: jumper_reverse
+        anchor:
+          ref: matrix_inner_top
+          shift: [chip_x + 1space - 0.5, display_pad_top + 0.65]
+        nets:
+          b_from: SCRN_4
+          b_to: GND
+          f_from: SCRN_4
+          f_to: P3
+      jumper5:
+        type: jumper_reverse
+        anchor:
+          ref: matrix_inner_top
+          shift: [chip_x + 2space - 0.5, display_pad_top + 0.65]
+        nets:
+          b_from: SCRN_5
+          b_to: P1
+          f_from: SCRN_5
+          f_to: P2
+      pcm12:
+        type: pcm12
+        anchor:
+          ref: matrix_inner_top
+          shift: [chip_x + chip_width - 9.165, display_pad_top - 3.45]
+          rotate: 90
+        nets:
+          from: pos
+          to: RAW
+        params:
+          reverse: true
+      b3u1000p:
+        type: b3u1000p
+        nets:
+          r1: RST
+          r2: GND
+        anchor:
+          ref: matrix_inner_top
+          shift: [chip_x - 7.2, display_pad_top - 3.5space]
+        params:
+          reverse: true
+      bat:
+        type: bat
+        nets:
+          neg: GND
+        anchor:
+          ref: matrix_inner_top
+          shift: [chip_x - 8.8, display_pad_top - space]
